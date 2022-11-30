@@ -66,6 +66,11 @@ public class FullyArmoredSheepUI extends javax.swing.JFrame {
 
         jButton1.setBackground(new java.awt.Color(153, 190, 241));
         jButton1.setText("Orders");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(153, 190, 241));
         jButton2.setText("Product Inventory");
@@ -111,6 +116,10 @@ public class FullyArmoredSheepUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        new OrdersUI().setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
