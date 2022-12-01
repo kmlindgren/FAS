@@ -6,7 +6,7 @@ package my.fullyarmoredsheep;
 
 /**
  *
- * @author brian
+ * @author Keira Lindgren
  */
 public class FullyArmoredSheepUI extends javax.swing.JFrame {
 
