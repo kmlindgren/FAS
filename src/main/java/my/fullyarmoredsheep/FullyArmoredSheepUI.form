@@ -122,9 +122,6 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Product Inventory"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButton3">
       <Properties>
@@ -133,9 +130,6 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Product Supplies Inventory"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButton4">
       <Properties>
@@ -144,9 +138,6 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Shipping Supplies Inventory"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton4ActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>
