@@ -40,7 +40,6 @@ public class OrdersUI extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
         jTextField2 = new javax.swing.JTextField();
@@ -72,11 +71,11 @@ public class OrdersUI extends javax.swing.JFrame {
 
         jButton1.setBackground(new java.awt.Color(153, 190, 241));
         jButton1.setText("Create Order");
-//        jButton1.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                jButton1ActionPerformed(evt);
-//            }
-//        });
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(153, 190, 241));
         jButton2.setText("Update Order");
@@ -84,11 +83,7 @@ public class OrdersUI extends javax.swing.JFrame {
         jButton3.setBackground(new java.awt.Color(153, 190, 241));
         jButton3.setText("Cancel Order");
 
-        jButton4.setBackground(new java.awt.Color(51, 124, 51));
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("Exit");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unfulfilled", "Shipped", "Delivered" }));
 
         jLabel1.setText("Order Date");
 
@@ -102,9 +97,6 @@ public class OrdersUI extends javax.swing.JFrame {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addGap(0, 0, Short.MAX_VALUE)
-                                                .addComponent(jButton4))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
@@ -157,9 +149,8 @@ public class OrdersUI extends javax.swing.JFrame {
                                         .addComponent(jButton3)
                                         .addComponent(jButton1)
                                         .addComponent(jButton2))
-                                .addGap(14, 14, 14)
-                                .addComponent(jButton4)
-                                .addContainerGap())
+                                .addGap(43, 43, 43)
+                        )
         );
 
         pack();
@@ -173,6 +164,9 @@ public class OrdersUI extends javax.swing.JFrame {
             Statement st = con.createStatement();
             String sql = "SELECT * FROM Orders";
             ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+
+            tblModel.setRowCount(0);
 
             while(rs.next()) {
                 String orderNum = String.valueOf(rs.getInt("OrderID"));
@@ -181,7 +175,7 @@ public class OrdersUI extends javax.swing.JFrame {
                 String total = rs.getString("Shipping");
 
                 String tbData[] = {orderNum, orderDate, status, total};
-                DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+
 
                 tblModel.addRow(tbData);
             }
@@ -193,8 +187,34 @@ public class OrdersUI extends javax.swing.JFrame {
         }
     }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-//        OrdersUI.dispose();
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        String orderDate = jTextField1.getText();
+        String status = (String)jComboBox1.getSelectedItem();
+        String orderTotal = jTextField2.getText();
+
+        if(orderDate.equals("") == false && orderTotal.equals("") == false) {
+            System.out.println(orderDate + ", " + status + ", " + orderTotal);
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "INSERT INTO Orders(OrderDate, OrderStatus, Shipping) VALUES('"+orderDate+"', '"+status+"', '"+orderTotal+"')";
+                st.executeUpdate(sql);
+
+                jTextField1.setText("");
+                jTextField2.setText("");
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
     }
 
     /**
@@ -236,7 +256,6 @@ public class OrdersUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
