@@ -68,6 +68,11 @@ public class OrdersUI extends javax.swing.JFrame {
         jTable1.setAlignmentX(0.0F);
         refreshjTable1();
         jScrollPane1.setViewportView(jTable1);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
 
         jButton1.setBackground(new java.awt.Color(153, 190, 241));
         jButton1.setText("Create Order");
@@ -176,7 +181,6 @@ public class OrdersUI extends javax.swing.JFrame {
 
                 String tbData[] = {orderNum, orderDate, status, total};
 
-
                 tblModel.addRow(tbData);
             }
 
@@ -215,6 +219,19 @@ public class OrdersUI extends javax.swing.JFrame {
         } else {
             //TODO: make popup window to tell user to fill fields
         }
+    }
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {
+        int row = jTable1.getSelectedRow();
+
+        String id = (String)jTable1.getValueAt(row, 0);
+        String date = (String)jTable1.getValueAt(row, 1);
+        String status = (String)jTable1.getValueAt(row, 2);
+        String price = (String)jTable1.getValueAt(row, 3);
+
+        jTextField1.setText(date);
+        jComboBox1.setSelectedItem(status);
+        jTextField2.setText(price);
     }
 
     /**
