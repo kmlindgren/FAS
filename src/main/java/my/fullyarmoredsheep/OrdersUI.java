@@ -84,9 +84,19 @@ public class OrdersUI extends javax.swing.JFrame {
 
         jButton2.setBackground(new java.awt.Color(153, 190, 241));
         jButton2.setText("Update Order");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(153, 190, 241));
         jButton3.setText("Cancel Order");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unfulfilled", "Shipped", "Delivered" }));
 
@@ -197,7 +207,6 @@ public class OrdersUI extends javax.swing.JFrame {
         String orderTotal = jTextField2.getText();
 
         if(orderDate.equals("") == false && orderTotal.equals("") == false) {
-            System.out.println(orderDate + ", " + status + ", " + orderTotal);
             try {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
@@ -221,10 +230,65 @@ public class OrdersUI extends javax.swing.JFrame {
         }
     }
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        int row = jTable1.getSelectedRow();
+        String orderID = (String)jTable1.getValueAt(row, 0);
+
+        String orderDate = jTextField1.getText();
+        String status = (String)jComboBox1.getSelectedItem();
+        String orderTotal = jTextField2.getText();
+
+        if(orderDate.equals("") == false && orderTotal.equals("") == false) {
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "UPDATE Orders SET OrderDate = '"+orderDate+"', OrderStatus = '"+status+"', Shipping = '"+orderTotal+"' WHERE OrderID = '"+orderID+"'";
+                st.executeUpdate(sql);
+
+                jTextField1.setText("");
+                jTextField2.setText("");
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
+    }
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        int row = jTable1.getSelectedRow();
+        String orderID = (String)jTable1.getValueAt(row, 0);
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+            Statement st = con.createStatement();
+            String sql = "DELETE FROM Orders WHERE OrderID = '"+orderID+"'";
+            st.executeUpdate(sql);
+
+            jTextField1.setText("");
+            jComboBox1.setSelectedItem("Unfulfilled");
+            jTextField2.setText("");
+
+            refreshjTable1();
+
+            con.close();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {
         int row = jTable1.getSelectedRow();
 
-        String id = (String)jTable1.getValueAt(row, 0);
         String date = (String)jTable1.getValueAt(row, 1);
         String status = (String)jTable1.getValueAt(row, 2);
         String price = (String)jTable1.getValueAt(row, 3);
