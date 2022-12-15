@@ -224,6 +224,12 @@ public class ProdSuppUI extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTable2);
 
+        jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable2MouseClicked(evt);
+            }
+        });
+
         refreshjTable2();
 
         if (jTable2.getColumnModel().getColumnCount() > 0) {
@@ -232,17 +238,27 @@ public class ProdSuppUI extends javax.swing.JFrame {
 
         jButton5.setBackground(new java.awt.Color(153, 190, 241));
         jButton5.setText("New Paint");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jButton6.setBackground(new java.awt.Color(153, 190, 241));
         jButton6.setText("Update Paint");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         jButton7.setBackground(new java.awt.Color(153, 190, 241));
         jButton7.setText("Delete Paint");
-//        jButton7.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                jButton7ActionPerformed(evt);
-//            }
-//        });
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Name");
 
@@ -552,7 +568,7 @@ public class ProdSuppUI extends javax.swing.JFrame {
 
         // 0=yes, 1=no, 2=cancel
         int confirm = JOptionPane.showConfirmDialog(null,
-                "Are you would like to delete this product? This action cannot be undone.",
+                "Are you would like to delete this dye? This action cannot be undone.",
                 "Continue?",
                 JOptionPane.YES_NO_OPTION);
 
@@ -628,6 +644,130 @@ public class ProdSuppUI extends javax.swing.JFrame {
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
+        String paintName = jTextField4.getText();
+        String color = jTextField5.getText();
+        String finish = jTextField7.getText();
+        String oz = Integer.toString((Integer)jSpinner2.getValue());
+        String paintPrice = jTextField6.getText();
+
+        if(!paintName.equals("")) {
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "INSERT INTO Paint(PaintName, Color, Finish, Oz, PaintPrice) VALUES('"+paintName+"', '"+color+"', '"+finish+"', '"+oz+"', '"+paintPrice+"')";
+                st.executeUpdate(sql);
+
+                jTextField4.setText("");
+                jTextField5.setText("");
+                jTextField7.setText("");
+                jSpinner2.setValue(0);
+                jTextField6.setText("");
+
+                refreshjTable2();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
+    }
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
+        int row = jTable2.getSelectedRow();
+        String paintID = (String)jTable2.getValueAt(row, 0);
+
+        String paintName = jTextField4.getText();
+        String color = jTextField5.getText();
+        String finish = jTextField7.getText();
+        String oz = Integer.toString((Integer)jSpinner2.getValue());
+        String paintPrice = jTextField6.getText();
+
+        if(!paintName.equals("")) {
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "UPDATE Paint SET PaintName = '"+paintName+"', Color = '"+color+"', Oz = '"+oz+"', PaintPrice = '"+paintPrice+"' WHERE PaintID = '"+paintID+"'";
+                st.executeUpdate(sql);
+
+                jTextField4.setText("");
+                jTextField5.setText("");
+                jTextField7.setText("");
+                jSpinner2.setValue(0);
+                jTextField6.setText("");
+
+                refreshjTable2();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
+    }
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
+
+        // 0=yes, 1=no, 2=cancel
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "Are you would like to delete this paint? This action cannot be undone.",
+                "Continue?",
+                JOptionPane.YES_NO_OPTION);
+
+        if(confirm==0) {
+
+            int row = jTable2.getSelectedRow();
+            String paintID = (String) jTable2.getValueAt(row, 0);
+
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "DELETE FROM Paint WHERE PaintID = '" + paintID + "'";
+                st.executeUpdate(sql);
+
+                jTextField4.setText("");
+                jTextField5.setText("");
+                jTextField7.setText("");
+                jSpinner2.setValue(0);
+                jTextField6.setText("");
+
+                refreshjTable2();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {
+        int row = jTable2.getSelectedRow();
+
+        String paintName = (String)jTable2.getValueAt(row, 1);
+        String color = (String)jTable2.getValueAt(row, 2);
+        String finish = (String)jTable2.getValueAt(row, 3);
+        int oz = Integer.parseInt((String) jTable2.getValueAt(row, 4));
+        String paintPrice = (String)jTable2.getValueAt(row, 5);
+
+        jTextField4.setText(paintName);
+        jTextField5.setText(color);
+        jTextField7.setText(finish);
+        jSpinner2.setValue(oz);
+        jTextField6.setText(paintPrice);
     }
 
     private void refreshjTable3() {
