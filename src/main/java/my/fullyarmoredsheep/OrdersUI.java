@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -263,27 +264,37 @@ public class OrdersUI extends javax.swing.JFrame {
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        int row = jTable1.getSelectedRow();
-        String orderID = (String)jTable1.getValueAt(row, 0);
 
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+        // 0=yes, 1=no, 2=cancel
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "Are you would like to cancel this order? This action cannot be undone.",
+                "Continue?",
+                JOptionPane.YES_NO_OPTION);
 
-            Statement st = con.createStatement();
-            String sql = "DELETE FROM Orders WHERE OrderID = '"+orderID+"'";
-            st.executeUpdate(sql);
+        if(confirm==0) {
 
-            jTextField1.setText("");
-            jComboBox1.setSelectedItem("Unfulfilled");
-            jTextField2.setText("");
+            int row = jTable1.getSelectedRow();
+            String orderID = (String) jTable1.getValueAt(row, 0);
 
-            refreshjTable1();
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
 
-            con.close();
+                Statement st = con.createStatement();
+                String sql = "DELETE FROM Orders WHERE OrderID = '" + orderID + "'";
+                st.executeUpdate(sql);
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+                jTextField1.setText("");
+                jComboBox1.setSelectedItem("Unfulfilled");
+                jTextField2.setText("");
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {
