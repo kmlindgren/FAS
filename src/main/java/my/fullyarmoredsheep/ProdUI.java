@@ -60,6 +60,12 @@ public class ProdUI extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
+
         refreshjTable1();
 
         jButton1.setBackground(new java.awt.Color(153, 190, 241));
@@ -126,19 +132,19 @@ public class ProdUI extends javax.swing.JFrame {
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addGap(40, 40, 40)
                                                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(56, 56, 56)
                                                                 .addComponent(jLabel2)
-                                                                .addGap(26, 26, 26)
+                                                                .addGap(41, 41, 41)
                                                                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addGap(16, 16, 16)
+                                                                .addGap(21, 21, 21)
                                                                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -189,8 +195,6 @@ public class ProdUI extends javax.swing.JFrame {
                 String qty = String.valueOf(rs.getInt("Qty"));
                 String prodPrice = rs.getString("ProdPrice");
 
-                System.out.println(prodNum);
-
                 String tbData[] = {prodNum, prodName, null, qty, prodPrice};
 
                 tblModel.addRow(tbData);
@@ -201,6 +205,20 @@ public class ProdUI extends javax.swing.JFrame {
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {
+        int row = jTable1.getSelectedRow();
+
+        String prodName = (String)jTable1.getValueAt(row, 1);
+        String prodLastOrdered = (String)jTable1.getValueAt(row, 2);
+        int qty = Integer.parseInt((String)jTable1.getValueAt(row, 3));
+        String prodPrice = (String)jTable1.getValueAt(row, 4);
+
+        jTextField1.setText(prodName);
+        jTextField2.setText(prodLastOrdered);
+        jSpinner1.setValue(qty);
+        jTextField3.setText(prodPrice);
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -235,10 +253,71 @@ public class ProdUI extends javax.swing.JFrame {
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        int row = jTable1.getSelectedRow();
+        String prodID = (String)jTable1.getValueAt(row, 0);
+
+        String prodName = jTextField1.getText();
+        int qty = Integer.parseInt(String.valueOf(jSpinner1.getValue()));
+        String prodPrice = jTextField3.getText();
+
+        if(!prodName.equals("")) {
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "UPDATE Product SET ProdName = '"+prodName+"', Qty = '"+qty+"', ProdPrice = '"+prodPrice+"' WHERE ProdID = '"+prodID+"'";
+                st.executeUpdate(sql);
+
+                jTextField1.setText("");
+                jTextField2.setText("");
+                jSpinner1.setValue(0);
+                jTextField3.setText("");
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
     }
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        // 0=yes, 1=no, 2=cancel
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "Are you would like to delete this product? This action cannot be undone.",
+                "Continue?",
+                JOptionPane.YES_NO_OPTION);
+
+        if(confirm==0) {
+
+            int row = jTable1.getSelectedRow();
+            String prodID = (String) jTable1.getValueAt(row, 0);
+
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "DELETE FROM Product WHERE ProdID = '" + prodID + "'";
+                st.executeUpdate(sql);
+
+                jTextField1.setText("");
+                jTextField2.setText("");
+                jSpinner1.setValue(0);
+                jTextField3.setText("");
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     /**
