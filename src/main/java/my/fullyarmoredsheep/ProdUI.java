@@ -4,6 +4,13 @@
  */
 package my.fullyarmoredsheep;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 /**
  *
  * @author brian
@@ -41,7 +48,7 @@ public class ProdUI extends javax.swing.JFrame {
         jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
@@ -53,11 +60,23 @@ public class ProdUI extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        refreshjTable1();
+
         jButton1.setBackground(new java.awt.Color(153, 190, 241));
         jButton1.setText("Create Product");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(153, 190, 241));
         jButton2.setText("Update Product");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(153, 190, 241));
         jButton3.setText("Delete Product");
@@ -77,12 +96,6 @@ public class ProdUI extends javax.swing.JFrame {
         jLabel3.setText("Qty");
 
         jLabel4.setText("Price");
-
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -158,11 +171,72 @@ public class ProdUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>
+    private void refreshjTable1() {
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+            Statement st = con.createStatement();
+            String sql = "SELECT ProdID, ProdName, Qty, ProdPrice FROM Product";
+            ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+
+            tblModel.setRowCount(0);
+
+            while(rs.next()) {
+                String prodNum = String.valueOf(rs.getInt("ProdID"));
+                String prodName = rs.getString("ProdName");
+                String qty = String.valueOf(rs.getInt("Qty"));
+                String prodPrice = rs.getString("ProdPrice");
+
+                System.out.println(prodNum);
+
+                String tbData[] = {prodNum, prodName, null, qty, prodPrice};
+
+                tblModel.addRow(tbData);
+            }
+
+            con.close();
+
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        String prodName = jTextField1.getText();
+        String qty = String.valueOf(jSpinner1.getValue());
+        String prodPrice = jTextField3.getText();
+
+        if(!prodName.equals("")) {
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
+
+                Statement st = con.createStatement();
+                String sql = "INSERT INTO Product(ProdName, Qty, ProdPrice) VALUES('"+prodName+"', '"+qty+"', '"+prodPrice+"')";
+                st.executeUpdate(sql);
+
+                jTextField1.setText("");
+                jTextField2.setText("");
+                jTextField3.setText("");
+                jSpinner1.setValue(0);
+
+                refreshjTable1();
+
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            //TODO: make popup window to tell user to fill fields
+        }
+    }
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
     }

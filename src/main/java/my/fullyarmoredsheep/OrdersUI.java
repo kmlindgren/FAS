@@ -207,7 +207,7 @@ public class OrdersUI extends javax.swing.JFrame {
         String status = (String)jComboBox1.getSelectedItem();
         String orderTotal = jTextField2.getText();
 
-        if(orderDate.equals("") == false && orderTotal.equals("") == false) {
+        if(!orderDate.equals("") && !orderTotal.equals("")) {
             try {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 Connection con = (Connection) DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=FAS", "username", "password123");
